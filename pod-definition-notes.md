@@ -16,8 +16,7 @@ spec:
       image: nginx
 ```
 
-> **Note:** The container `name` field in your file is `ngnix` (typo). It should be `nginx`.
-> The name doesn't affect which image is pulled, but it's used in logs and `kubectl exec` — keep it accurate.
+> **Note:** The name doesn't affect which image is pulled, but it's used in logs and `kubectl exec` — keep it accurate.
 
 ---
 
@@ -200,4 +199,4 @@ metadata    →  identity (name, labels, namespace, annotations)
 spec        →  desired state (what should run / exist)
 ```
 
-Kubernetes adds a fifth field, `status`, automatically — you never write it; the control plane fills it in to report the *current* state vs. your desired `spec`.
+Kubernetes adds a fifth field, `status`, automatically — you never write it; the control plane fills it in to report the _current_ state vs. your desired `spec`.
