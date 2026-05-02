@@ -7,5 +7,5 @@ metadata:
     type: front-end
 spec:
   containers:
-    - name: ngnix
+    - name: nginx
       image: nginx
