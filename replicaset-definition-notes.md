@@ -31,11 +31,23 @@ spec:
 
 ## What is a ReplicaSet?
 
-A ReplicaSet is a Kubernetes controller whose only job is to **ensure a specified number of identical Pods are running at all times**.
+A ReplicaSet is a Kubernetes controller whose only job is to **ensure a specified number of identical Pods are running at all times**. It solves two core problems:
 
-- If a Pod crashes or a node goes down, the ReplicaSet notices the count has dropped and starts a replacement.
-- If there are too many Pods (e.g. you scaled down), it terminates the extras.
+**1. High Availability**
+
+- Running multiple instances of a Pod means your application keeps working even if one Pod crashes or a node goes down.
+- The ReplicaSet notices the count has dropped and immediately starts a replacement — no manual intervention needed.
 - It does this continuously in a reconciliation loop — forever.
+
+**2. Load Balancing and Scaling**
+
+- Multiple replicas allow traffic to be spread across Pods, so no single Pod is overwhelmed.
+- When demand increases, you scale up replicas; when demand drops, you scale down — the ReplicaSet handles the Pod count either way.
+
+**Spans across multiple nodes**
+
+- The ReplicaSet controller works at the cluster level, not a single node. Kubernetes schedules its Pods across different nodes automatically.
+- This means even if an entire node goes down, Pods on other nodes keep serving traffic and the lost Pods are rescheduled elsewhere.
 
 > In practice, you rarely create a ReplicaSet directly. A `Deployment` creates and manages a ReplicaSet for you, and adds rolling-update and rollback on top. But understanding ReplicaSet first makes Deployments much easier to grasp.
 
@@ -117,6 +129,7 @@ replicas: 3
 ```yaml
 selector:
   matchLabels:
+    app: my-nginx
     tier: frontend
 ```
 
@@ -217,8 +230,13 @@ This design also means: if a Pod with matching labels exists in the namespace **
 ## Key ReplicaSet Commands
 
 ```bash
-# Create from file
+# Create from file (preferred)
 kubectl apply -f replicaset-definition.yml
+
+# Alternative: kubectl create -f replicaset-definition.yml
+# Not recommended — it fails with an "AlreadyExists" error if the resource is
+# already in the cluster, so you cannot re-run it safely. kubectl apply is
+# idempotent (safe to run multiple times) and is the standard declarative approach.
 
 # List all ReplicaSets
 kubectl get replicasets
@@ -227,8 +245,19 @@ kubectl get rs                          # shorthand
 # Show details: events, selector, pod status
 kubectl describe replicaset myreplicaset-agentic-de
 
-# Scale replicas up or down
-kubectl scale rs myreplicaset-agentic-de --replicas=5
+# Scale replicas — three ways:
+
+# 1. By resource type and name
+kubectl scale rs myreplicaset-agentic-de --replicas=6
+
+kubectl scale replicaset myreplicaset-agentic-de --replicas=6
+
+# 2. By file (scales whatever resource the file defines)
+kubectl scale -f replicaset-definition.yml --replicas=6
+
+# 3. Edit replicas in the yml file and re-apply (most declarative)
+#    change replicas: 6 in replicaset-definition.yml, then:
+kubectl apply -f replicaset-definition.yml
 
 # See the Pods the ReplicaSet created
 kubectl get pods -l key=value

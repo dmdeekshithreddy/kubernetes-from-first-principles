@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-  name: myreplicaset-agentic-de
+  name: myreplicaset-nginx
   labels:
-    app: agentic-de
+    app: my-nginx
     tier: frontend
 spec:
   replicas: 3
