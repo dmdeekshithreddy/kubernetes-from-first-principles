@@ -4,17 +4,19 @@ metadata:
   name: myreplicaset-agentic-de
   labels:
     app: agentic-de
-    key: value
+    tier: frontend
 spec:
-  replicas: <Replicas>
+  replicas: 3
   selector:
     matchLabels:
-      key: value
+      app: my-nginx
+      type: front-end
   template:
     metadata:
       labels:
-        key: value
+        app: my-nginx
+        type: front-end
     spec:
       containers:
-        - name: myapp
-          image: <Image>
+        - name: nginx
+          image: nginx:latest

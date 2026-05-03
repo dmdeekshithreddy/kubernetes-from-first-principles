@@ -9,19 +9,21 @@ metadata:
   name: myreplicaset-agentic-de
   labels:
     app: agentic-de
-    key: value
+    tier: frontend
 spec:
   replicas: 3
   selector:
     matchLabels:
-      key: value
+      app: my-nginx
+      tier: frontend
   template:
     metadata:
       labels:
-        key: value
+        app: my-nginx
+        tier: frontend
     spec:
       containers:
-        - name: myapp
+        - name: nginx-container
           image: nginx:1.25.3
 ```
 
@@ -69,7 +71,7 @@ metadata:
   name: myreplicaset-agentic-de
   labels:
     app: agentic-de
-    key: value
+    tier: frontend
 ```
 
 Same structure as a Pod's metadata — these fields apply to the **ReplicaSet object itself**, not the Pods it creates.
@@ -115,7 +117,7 @@ replicas: 3
 ```yaml
 selector:
   matchLabels:
-    key: value
+    tier: frontend
 ```
 
 This is the **most important and most misunderstood field** in a ReplicaSet.
@@ -158,10 +160,11 @@ selector:
 template:
   metadata:
     labels:
-      key: value
+      app: my-nginx
+      type: front-end
   spec:
     containers:
-      - name: myapp
+      - name: nginx-container
         image: nginx:1.25.3
 ```
 
@@ -241,11 +244,11 @@ kubectl delete rs myreplicaset-agentic-de --cascade=orphan
 
 ## ReplicaSet vs Deployment — When to Use Which
 
-| | ReplicaSet | Deployment |
-|---|---|---|
-| Keeps N pods running | yes | yes (via a ReplicaSet it owns) |
-| Rolling updates | no | yes |
-| Rollback | no | yes |
-| Use directly in production | rarely | yes — preferred |
+|                            | ReplicaSet | Deployment                     |
+| -------------------------- | ---------- | ------------------------------ |
+| Keeps N pods running       | yes        | yes (via a ReplicaSet it owns) |
+| Rolling updates            | no         | yes                            |
+| Rollback                   | no         | yes                            |
+| Use directly in production | rarely     | yes — preferred                |
 
 Use a ReplicaSet directly only when you need the raw primitive and do not need rolling updates. For everything else, use a Deployment.
