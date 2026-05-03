@@ -16,7 +16,7 @@ spec:
       image: nginx
 ```
 
-> **Note:** The name doesn't affect which image is pulled, but it's used in logs and `kubectl exec` — keep it accurate.
+> **Note:** The container name doesn't affect which image is pulled, but it's used in logs and `kubectl exec` — keep it accurate.
 
 ---
 
@@ -100,7 +100,6 @@ labels:
   | `type` / `tier` | `front-end`, `back-end`, `db` | logical layer |
   | `env` | `production`, `staging` | environment |
   | `version` | `v1.2.0` | app version |
-- Labels differ from **annotations**: labels are for selecting/filtering; annotations are for storing arbitrary metadata (e.g. build info, owner contact) that tools read but Kubernetes doesn't use for scheduling.
 
 ---
 
@@ -199,4 +198,4 @@ metadata    →  identity (name, labels, namespace, annotations)
 spec        →  desired state (what should run / exist)
 ```
 
-Kubernetes adds a fifth field, `status`, automatically — you never write it; the control plane fills it in to report the _current_ state vs. your desired `spec`.
+Kubernetes adds a fifth field, `status`, automatically — you never write it yourself. The control plane continuously watches your `spec` (what you asked for) and updates `status` to reflect what is actually running right now. For example, if you asked for 3 replicas and only 2 started successfully, `spec` still says 3 but `status` will show 2 ready. Kubernetes keeps trying to close that gap.
